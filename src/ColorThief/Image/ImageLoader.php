@@ -184,8 +184,16 @@ class ImageLoader
     {
         if (is_string($data)) {
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mime = finfo_buffer($finfo, $data);
-            finfo_close($finfo);
+
+            if ($finfo === false) {
+                return false;
+            }
+
+            $mime = (string)finfo_buffer($finfo, $data);
+
+            if (version_compare(phpversion(), '8.4', '<') === true) {
+                finfo_close($finfo);
+            }
 
             return 'text' != substr($mime, 0, 4) && 'application/x-empty' != $mime;
         }
